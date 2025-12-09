@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Google Apps Script</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f0f0f0;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test Google Apps Script Web App</h1>
+  
+  <p>This page tests if your Apps Script is receiving data correctly.</p>
+  
+  <button onclick="testGet()">Test GET Request</button>
+  <button onclick="testGetDirect()">Test GET (Direct URL)</button>
+  <button onclick="testPost()">Test POST Request</button>
+  
+  <div id="result" class="result" style="display:none;"></div>
+
+  <script>
+    const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwFzO4C069Acmm_rP1jP61AenUBYl7_eo1Ieqe6iAjXzpZMgApAhPRTAYfVIiSEYCmWNQ/exec";
+    const APP_PASSWORD = "uzdh iiso omms aaic";
+    
+    function testGet() {
+      const params = new URLSearchParams({
+        name: 'Test User',
+        email: 'test@example.com',
+        phone: '+91 9876543210',
+        message: 'Test from browser',
+        appPassword: APP_PASSWORD
+      });
+      
+      const url = `${APP_SCRIPT_URL}?${params.toString()}`;
+      console.log('Testing GET:', url.replace(APP_PASSWORD, '***'));
+      
+      fetch(url, { method: 'GET', mode: 'no-cors' })
+        .then(() => {
+          document.getElementById('result').style.display = 'block';
+          document.getElementById('result').innerHTML = '✅ GET request sent (check Apps Script Executions)';
+        })
+        .catch(err => {
+          document.getElementById('result').style.display = 'block';
+          document.getElementById('result').innerHTML = '❌ Error: ' + err.message;
+        });
+    }
+    
+    function testGetDirect() {
+      const params = new URLSearchParams({
+        name: 'Direct Test',
+        email: 'direct@example.com',
+        phone: '+91 9876543210',
+        message: 'Direct URL test',
+        appPassword: APP_PASSWORD
+      });
+      
+      const url = `${APP_SCRIPT_URL}?${params.toString()}`;
+      console.log('Opening direct URL:', url.replace(APP_PASSWORD, '***'));
+      
+      // Open in new window to see response
+      window.open(url, '_blank');
+      
+      document.getElementById('result').style.display = 'block';
+      document.getElementById('result').innerHTML = '✅ Opened URL in new window. Check Apps Script Executions tab.';
+    }
+    
+    function testPost() {
+      const formData = new URLSearchParams({
+        name: 'POST Test',
+        email: 'post@example.com',
+        phone: '+91 9876543210',
+        message: 'POST request test',
+        appPassword: APP_PASSWORD
+      });
+      
+      fetch(APP_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: formData
+      })
+        .then(() => {
+          document.getElementById('result').style.display = 'block';
+          document.getElementById('result').innerHTML = '✅ POST request sent (check Apps Script Executions)';
+        })
+        .catch(err => {
+          document.getElementById('result').style.display = 'block';
+          document.getElementById('result').innerHTML = '❌ Error: ' + err.message;
+        });
+    }
+  </script>
+</body>
+</html>
+

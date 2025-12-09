@@ -22,12 +22,45 @@ function doOptions() {
  */
 function doPost(e) {
   try {
-    // 📝 Parse form data from request
-    const data = JSON.parse(e.postData.contents || '{}');
+    // Log received data for debugging
+    Logger.log('Received event: ' + JSON.stringify(e));
     
-    // 🔒 Security: Check app password (from headers or body)
-    const reqPassword = e?.headers?.['x-app-password'] || data.appPassword || e?.parameter?.password;
+    // Check if event and postData exist
+    if (!e) {
+      Logger.log('Error: Event object is undefined');
+      return ContentService
+        .createTextOutput(JSON.stringify({ ok: false, error: 'No data received' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // Try to get data from postData, parameter, or query string
+    let data = {};
+    let reqPassword = '';
+    
+    if (e.postData && e.postData.contents) {
+      // Standard POST with JSON body
+      data = JSON.parse(e.postData.contents);
+      reqPassword = e?.headers?.['x-app-password'] || data.appPassword || e?.parameter?.password;
+    } else if (e.parameter) {
+      // URL-encoded form data or query parameters
+      data = {
+        name: e.parameter.name || '',
+        email: e.parameter.email || '',
+        phone: e.parameter.phone || '',
+        message: e.parameter.message || '',
+        appPassword: e.parameter.appPassword || ''
+      };
+      reqPassword = e.parameter.appPassword || e.parameter.password || '';
+    } else {
+      Logger.log('Error: No postData or parameter found');
+      return ContentService
+        .createTextOutput(JSON.stringify({ ok: false, error: 'Invalid request format' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // 🔒 Security: Check app password
     if (reqPassword !== APP_PASSWORD) {
+      Logger.log('Unauthorized: Password mismatch. Expected: ' + APP_PASSWORD + ', Got: ' + reqPassword);
       return ContentService
         .createTextOutput(JSON.stringify({ ok: false, error: 'Unauthorized' }))
         .setMimeType(ContentService.MimeType.JSON);
@@ -38,6 +71,8 @@ function doPost(e) {
     const email = data.email || '';
     const phone = data.phone || '';
     const message = data.message || '';
+    
+    Logger.log('Processing submission: ' + name + ', ' + email);
 
     // 📊 Get the active spreadsheet and sheet
     // NOTE: This works because the script is "bound" to your sheet

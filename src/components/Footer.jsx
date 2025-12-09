@@ -3,7 +3,7 @@ export default function Footer() {
     <footer className="footer">
       <div className="footer-inner">
         <div className="brand">
-          <span className="brand-mark">PG</span>
+          <img src="/images/WHITE LW.png" alt="LW Logo" className="brand-mark" />
           <div>
             <strong>Prometheus &amp; Grafana Training</strong>
             <br />
@@ -11,9 +11,9 @@ export default function Footer() {
           </div>
         </div>
         <div className="socials">
-          <a href="https://www.linkedin.com" aria-label="LinkedIn">in</a>
-          <a href="https://twitter.com" aria-label="Twitter">𝕏</a>
-          <a href="https://youtube.com" aria-label="YouTube">▶</a>
+          <a href="https://www.linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn">in</a>
+          <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="Twitter">𝕏</a>
+          <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube">▶</a>
         </div>
         <div>
           © {new Date().getFullYear()} Prometheus &amp; Grafana Training. All rights reserved.

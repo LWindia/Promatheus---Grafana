@@ -6,6 +6,7 @@ import Outcomes from "./components/Outcomes.jsx";
 import Curriculum from "./components/Curriculum.jsx";
 import Audience from "./components/Audience.jsx";
 import Schedule from "./components/Schedule.jsx";
+import Mentor from "./components/Mentor.jsx";
 import Pricing from "./components/Pricing.jsx";
 import Contact from "./components/Contact.jsx";
 import Footer from "./components/Footer.jsx";
@@ -17,6 +18,7 @@ const sections = [
   { id: "curriculum", Component: Curriculum },
   { id: "audience", Component: Audience },
   { id: "schedule", Component: Schedule },
+  { id: "mentor", Component: Mentor },
   { id: "pricing", Component: Pricing },
   { id: "contact", Component: Contact },
 ];
