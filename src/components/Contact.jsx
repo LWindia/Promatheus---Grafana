@@ -2,7 +2,7 @@ import { useState } from "react";
 
 // ⚙️ CONFIGURATION: Update these after setting up Google Apps Script
 // See GOOGLE_SHEETS_SETUP.md for step-by-step instructions
-const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwA7aY3ZZGhdzGezDyJuOojutd77-pDaxppAh2r9e4S3_qTN5eOw4OYhoUJKSxew-MwNg/exec";
+const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyt5x5DJ6k24pd4iZfkIaNG1P5RBd-mBI7Iai2-z83xe-9fstCnM_a0NPQNvWKHZMvgfA/exec";
 const APP_PASSWORD = "uzdh iiso omms aaic"; // Must match the password in Apps Script
 const CHAT_URL = "https://wa.me/919772201449";
 const SUPPORT_EMAIL = "support@lwindia.com";
@@ -11,65 +11,82 @@ const SUPPORT_PHONE = "+91 9772201449";
 export default function Contact() {
   const [status, setStatus] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const form = e.target;
     const data = Object.fromEntries(new FormData(form));
     setStatus("Submitting...");
     
-    // Build URL with query parameters
-    const params = new URLSearchParams({
-      name: data.name || '',
-      email: data.email || '',
-      phone: data.phone || '',
-      message: data.message || '',
+    // Use hidden iframe form submission - MOST RELIABLE method for Google Apps Script
+    const iframe = document.createElement('iframe');
+    iframe.name = 'form-submit-iframe-' + Date.now();
+    iframe.style.display = 'none';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = 'none';
+    document.body.appendChild(iframe);
+    
+    // Create a form that will submit to the iframe
+    const submitForm = document.createElement('form');
+    submitForm.method = 'GET';
+    submitForm.action = APP_SCRIPT_URL;
+    submitForm.target = iframe.name;
+    submitForm.style.display = 'none';
+    
+    // Add all form fields as hidden inputs
+    const fields = {
+      name: (data.name || '').trim(),
+      email: (data.email || '').trim(),
+      phone: (data.phone || '').trim(),
+      message: (data.message || '').trim(),
       appPassword: APP_PASSWORD
+    };
+    
+    // Validate required fields
+    if (!fields.name || !fields.email || !fields.phone) {
+      setStatus("❌ Please fill in all required fields.");
+      document.body.removeChild(iframe);
+      return;
+    }
+    
+    // Add fields to form
+    Object.entries(fields).forEach(([key, value]) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = value;
+      submitForm.appendChild(input);
     });
     
-    const url = `${APP_SCRIPT_URL}?${params.toString()}`;
+    document.body.appendChild(submitForm);
     
     // Log what we're sending
     console.log("Submitting form:", {
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      message: data.message,
+      name: fields.name,
+      email: fields.email,
+      phone: fields.phone,
+      message: fields.message,
       appPassword: "***hidden***"
     });
-    console.log("Submitting to URL:", url.replace(APP_PASSWORD, "***"));
     
-    try {
-      // Try direct fetch with GET - should work with Google Apps Script
-      const response = await fetch(url, {
-        method: 'GET',
-        mode: 'no-cors', // Still need no-cors for Google Apps Script
-      });
-      
-      // With no-cors we can't read response, but request was sent
-      setStatus("✅ Thanks! We received your details.");
+    // Submit the form
+    submitForm.submit();
+    
+    // Clean up and show success after a delay
+    setTimeout(() => {
+      setStatus("✅ Thanks! We received your details. Check your sheet to confirm.");
       form.reset();
-      console.log("Form submitted successfully. Check your sheet to confirm.");
       
-    } catch (err) {
-      // Fallback: Use image pixel method (most reliable)
-      console.log("Fetch failed, using image pixel method:", err);
-      const img = document.createElement('img');
-      img.src = url;
-      img.style.display = 'none';
-      img.onload = () => {
-        setStatus("✅ Thanks! We received your details.");
-        form.reset();
-        document.body.removeChild(img);
-      };
-      img.onerror = () => {
-        setStatus("✅ Thanks! We received your details.");
-        form.reset();
-        if (document.body.contains(img)) {
-          document.body.removeChild(img);
+      // Clean up after a bit more time
+      setTimeout(() => {
+        if (document.body.contains(submitForm)) {
+          document.body.removeChild(submitForm);
         }
-      };
-      document.body.appendChild(img);
-    }
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
+        }
+      }, 2000);
+    }, 500);
   };
 
   return (
