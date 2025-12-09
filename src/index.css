@@ -829,10 +829,60 @@ main > .section[data-animate] > .section-inner {
 
 @media (max-width: 720px) {
   .hero-card {
-    padding: 24px;
+    padding: 20px;
   }
+  
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
   .hero-banner {
-    min-height: 260px;
+    min-height: 280px;
+    width: 100%;
+  }
+  
+  .banner-metrics {
+    padding: 16px;
+    gap: 8px;
+    align-content: flex-end;
+  }
+  
+  .banner-metrics .badge {
+    font-size: 12px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+  }
+  
+  .banner-metrics .stat {
+    padding: 10px 12px;
+    font-size: 13px;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+  
+  .banner-metrics .stat span {
+    font-size: 12px;
+    opacity: 0.9;
+  }
+  
+  .banner-metrics .stat strong {
+    font-size: 14px;
+    margin-top: 2px;
+  }
+  
+  .hero-actions {
+    margin: 18px 0;
+  }
+  
+  .highlight-pills {
+    gap: 8px;
+  }
+  
+  .pill {
+    padding: 8px 10px;
+    font-size: 13px;
   }
 }
 
