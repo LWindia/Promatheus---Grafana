@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Submission Test</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #fff;
+    }
+    .test-form {
+      background: #2a2a2a;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #444;
+      border-radius: 4px;
+      background: #1a1a1a;
+      color: #fff;
+      box-sizing: border-box;
+    }
+    button {
+      background: #ff6b35;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #ff5722;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .success {
+      background: #2d5a2d;
+      border: 1px solid #4caf50;
+    }
+    .error {
+      background: #5a2d2d;
+      border: 1px solid #f44336;
+    }
+    .info {
+      background: #2d3a5a;
+      border: 1px solid #2196f3;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Form Submission Test</h1>
+  <p>This will test if your form can submit to Google Apps Script and save to your sheet.</p>
+  
+  <div class="test-form">
+    <form id="testForm">
+      <input type="text" name="name" placeholder="Name" value="Test User" required>
+      <input type="email" name="email" placeholder="Email" value="test@example.com" required>
+      <input type="text" name="phone" placeholder="Phone" value="+91 9876543210" required>
+      <textarea name="message" placeholder="Message" rows="3">This is a test submission from the test page</textarea>
+      <button type="submit">Test Submit</button>
+    </form>
+    
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTs5OaMFytIfT2VyJDmY25eQDkBzqvbyDH9RZgDVm-9SMNoCiPCI2HBOQmD5x8NeyUkg/exec";
+    const APP_PASSWORD = "uzdh iiso omms aaic";
+
+    document.getElementById('testForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const data = Object.fromEntries(new FormData(form));
+      const resultDiv = document.getElementById('result');
+      
+      resultDiv.className = 'result info';
+      resultDiv.textContent = '🔄 Submitting...\n\nRequest details:\n' + 
+        JSON.stringify({ url: APP_SCRIPT_URL, password: APP_PASSWORD.replace(/./g, '*'), data }, null, 2);
+
+      try {
+        console.log('Sending request:', { url: APP_SCRIPT_URL, data, password: APP_PASSWORD });
+        
+        // Include password in body for no-cors mode
+        const payload = {
+          ...data,
+          appPassword: APP_PASSWORD
+        };
+
+        await fetch(APP_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors', // Required to bypass CORS
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        // With no-cors, we can't read the response, but request was sent
+        resultDiv.className = 'result success';
+        resultDiv.textContent = '✅ Request sent successfully!\n\n' +
+          'Note: With no-cors mode, we cannot read the response.\n' +
+          'Please check:\n' +
+          '1. Your Google Sheet - a new row should appear\n' +
+          '2. Apps Script → Executions tab - check for errors\n\n' +
+          'If no data appears, verify:\n' +
+          '- Password matches in Apps Script\n' +
+          '- Sheet tab name is correct\n' +
+          '- Apps Script has permission to edit sheet';
+
+      } catch (err) {
+        resultDiv.className = 'result error';
+        resultDiv.textContent = '❌ Error occurred:\n\n' + err.toString() + '\n\n' +
+          'Stack trace:\n' + err.stack;
+        console.error('Submission error:', err);
+      }
+    });
+  </script>
+</body>
+</html>
+
