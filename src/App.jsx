@@ -13,9 +13,10 @@ import Footer from "./components/Footer.jsx";
 
 const sections = [
   { id: "hero", Component: Hero },
+  // Move curriculum above "Why this training" (About) per request
+  { id: "curriculum", Component: Curriculum },
   { id: "about", Component: About },
   { id: "outcomes", Component: Outcomes },
-  { id: "curriculum", Component: Curriculum },
   { id: "audience", Component: Audience },
   { id: "schedule", Component: Schedule },
   { id: "mentor", Component: Mentor },

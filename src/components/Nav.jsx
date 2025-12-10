@@ -1,9 +1,9 @@
 import { useState } from "react";
 
 const navLinks = [
+  { href: "#curriculum", label: "Curriculum" },
   { href: "#about", label: "About" },
   { href: "#outcomes", label: "Outcomes" },
-  { href: "#curriculum", label: "Curriculum" },
   { href: "#schedule", label: "Schedule" },
   { href: "#mentor", label: "Mentor" },
   { href: "#pricing", label: "Pricing" },
